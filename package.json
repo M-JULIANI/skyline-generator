@@ -1,7 +1,7 @@
 {
   "name": "skyline-generator",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://m-juliani.github.io/skyline-generator/",
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
