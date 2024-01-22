@@ -11,16 +11,8 @@ const lerpColor = (color1, color2, t) => {
     return { r, g, b };
 };
 
-// const settings = {
-//     dimensions: [1080, 1080],
-//     animate: false,
-//     //duration: 1000
-// };
 
 const settings = {
-    // dimensions: 'a4',
-    // pixelsPerInch: 300,
-    // units: 'in',
     dimensions: [1080, 1080],
     scaleToView: true,
     animate: true,
@@ -43,9 +35,6 @@ const params = {
     backgroundR: 180,
     backgroundG: 180,
     backgroundB: 180
-    //  borderWidth: 0,
-    // startColor: `rgb(${0}, ${0}, ${0}`,
-    // endColor: `rgb(${255}, ${255}, ${255}`
 }
 
 let shouldAnimate = false;
@@ -56,20 +45,6 @@ let useRandomColor = false;
 let seedo = 0;
 let layero = 5;
 
-let backR = 0;
-let backG = 0;
-let backB = 0;
-
-let bfrontR = 0;
-let bfrontG = 0;
-let bfrontB = 0;
-
-let bbackR = 0;
-let bbackG = 0;
-let bbackB = 0;
-
-let _backgroundColor = 'white';
-
 const sketch = ({ context, width, height }) => {
 
     generateBackground(context, width, height)
@@ -79,26 +54,20 @@ const sketch = ({ context, width, height }) => {
     return ({ context, width, height }) => {
         seedo  = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 100));
         layero = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 10));
-        backR = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
-        backG = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
-        backB = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
 
-        bbackR = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
-        bbackG = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
-        bbackB = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
-
-
-        bfrontR = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
-        bfrontG = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
-        bfrontB = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
-
-        _backgroundColor = `rgb(${backR}, ${backG}, ${backB})`
+        
         if(shouldRepaintBackground){
-            generateBackground(context, width, height, _backgroundColor)
+            generateBackground(context, width, height)
             shouldRepaintBackground = false;
+            try {
+                skyline.drawCanvas(context, params.colorSeed);
+            }
+            catch (e) {
+                console.log(e);
+            }
         }
         if (shouldAnimate) {
-            generateBackground(context, width, height, _backgroundColor)
+            generateBackground(context, width, height)
             skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
             shouldAnimate = false;
 
@@ -114,7 +83,7 @@ const sketch = ({ context, width, height }) => {
 
            // skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
             shouldRerender = false;
-
+            generateBackground(context, width, height)
             try {
                 skyline.drawCanvas(context, params.colorSeed);
             }
@@ -130,7 +99,9 @@ const createPane = () => {
     const pane = new Tweakpane.Pane();
     let folder;
 
-    folder = pane.addFolder({ title: 'Shape' });
+    let mainFolder = pane.addFolder({title: 'skyline'})
+
+    folder = mainFolder.addFolder({ title: 'Shape' });
     folder.addInput(params, 'layers', { min: 2, max: 20, step: 1 }).on('change', (value) => {
         shouldAnimate = true;
     });
@@ -145,21 +116,19 @@ const createPane = () => {
         shouldAnimate = true;
     });
 
-    folder = pane.addFolder({ title: 'Color' });
+    folder = mainFolder.addFolder({ title: 'Color' });
     folder.addInput(params, 'colorSeed', { min: 0.0, max: 100.0, step: 1.0 }).on('change', (value) => {
-        shouldAnimate = true;
+        shouldRerender = true;
 
     });
 
     folder.addInput(params, 'randomColor', { min: 0.0, max: 1.0, step: 1.0 }).on('change', (value) => {
         shouldRerender = true;
-        useRandomColor = !useRandomColor
-
     });
 
 
-    folder = pane.addFolder({ title: 'Blended Colors' });
-    folder = pane.addFolder({ title: 'Color 1' });
+    folder = mainFolder.addFolder({ title: 'Blended Colors' });
+    folder = mainFolder.addFolder({ title: 'Color 1' });
 
     folder.addInput(params, 'r1', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', (value) => {
         shouldRerender = true;
@@ -175,7 +144,7 @@ const createPane = () => {
     });;
 
 
-    folder = pane.addFolder({ title: 'Color2' });
+    folder = mainFolder.addFolder({ title: 'Color2' });
 
     folder.addInput(params, 'r2', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', (value) => {
         shouldRerender = true;
@@ -189,7 +158,7 @@ const createPane = () => {
         shouldRerender = true;
     });
 
-    folder = pane.addFolder({ title: 'Background Color' });
+    folder = mainFolder.addFolder({ title: 'Background Color' });
 
     folder.addInput(params, 'backgroundR', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', (value) => {
         shouldRepaintBackground = true;
@@ -202,9 +171,52 @@ const createPane = () => {
     folder.addInput(params, 'backgroundB', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', (value) => {
         shouldRepaintBackground = true;
     });
+
+    return pane;
 }
 
 createPane();
+//
+// //  Make the pane draggable
+// let isDragging = false;
+// let startX = 0;
+// let startY = 0;
+
+// // The element that you'll be dragging
+// const paneElement = pane.element; // This is the default container element of Tweakpane
+
+// let dragOffsetX = 0;
+// let dragOffsetY = 0;
+
+// paneElement.addEventListener('mousedown', function(e) {
+//   // Only start drag if the primary mouse button is pressed
+//   if (e.button !== 0) return;
+
+//   console.log({e, paneElement})
+
+//   isDragging = true;
+//   dragOffsetX = e.clientX - paneElement.getBoundingClientRect().left;
+//   dragOffsetY = e.clientY - paneElement.getBoundingClientRect().top;
+//   paneElement.style.cursor = 'grabbing';
+  
+//   // Prevent default dragging behavior for images or text selections
+//   e.preventDefault();
+// });
+
+// document.addEventListener('mousemove', function(e) {
+//   if (!isDragging) return;
+//   paneElement.style.position = 'absolute';
+//   paneElement.style.left = e.clientX - dragOffsetX + 'px';
+//   paneElement.style.top = e.clientY - dragOffsetY + 'px';
+// });
+
+// document.addEventListener('mouseup', function() {
+//   if (isDragging) {
+//     isDragging = false;
+//     paneElement.style.cursor = 'grab';
+//   }
+// });
+
 canvasSketch(sketch, settings);
 
 class Building {
@@ -239,8 +251,6 @@ class Skyline {
 
         const { minHeight, maxHeight } = heightRange;
         const { minWidth, maxWidth } = widthRange;
-        //  console.log({ heightRange, widthRange })
-
         const bldgs = [];
 
         let x = 0;
@@ -251,7 +261,6 @@ class Skyline {
             let bHeight = mapRange(rH, 0, 1.0, minHeight, maxHeight);
 
             const n = (noise1D(x, maxWidth * 0.2, maxHeight * 0.25));
-           // if (Math.random() > 0.75) bHeight *= 0.5;
             bHeight +=n;
             const bldg = new Building(x, 0, bWidth, bHeight);
             bldgs.push(bldg);
@@ -277,30 +286,19 @@ class Skyline {
         bldgs.forEach((layer, index) => {
 
             const t = index / (this.buildings.length ?? 1)
-            // const c = lerpColor(
-            //     { r: params.r1, g: params.g1, b: params.b1 },
-            //     { r: params.r2, g: params.g2, b: params.b2 },
-            //     t
-            // );
-
             const c = lerpColor(
-                { r: bbackR, g: bbackG, b: bbackB },
-                { r: bfrontR, g: bfrontG, b: bfrontB }, t
+                { r: params.r1, g: params.g1, b: params.b1 },
+                { r: params.r2, g: params.g2, b: params.b2 },
+                t
             );
 
-            // const red = Math.floor(this.colorSeed() * 256);
-            // const green = Math.floor(this.colorSeed() * 256);
-            // const blue = Math.floor(this.colorSeed() * 256);
+            const red = Math.floor(this.colorSeed() * 256);
+            const green = Math.floor(this.colorSeed() * 256);
+            const blue = Math.floor(this.colorSeed() * 256);
 
-            // const color = useRandomColor
-            //     ? `rgb(${red}, ${green}, ${blue}`
-            //     : `rgb(${c.r}, ${c.g}, ${c.b}`;
-
-            const color =`rgb(${c.r}, ${c.g}, ${c.b}`;
-
-          //  const hex = RGBAToHex([red, green, blue]);
-          //  const lit = lightenColor(hex, 0.05);
-
+            const color = params.randomColor === 1
+                ? `rgb(${red}, ${green}, ${blue})`
+                : `rgb(${c.r}, ${c.g}, ${c.b})`;
             layer.forEach(x => this.drawBuilding(context, x, color, t))
         })
 
@@ -406,41 +404,12 @@ const renderHatch = (
     context.fillRect(building.x, vOffset, building.width, -building.height);
 };
 
-// Utility function to mix two colors
-function mixColors(color1, color2, percent) {
-    const factor = percent / 100;
-    const result = [];
-    for (let i = 0; i < 6; i += 2) {
-        const channel1 = parseInt(color1.substr(i, 2), 16);
-        const channel2 = parseInt(color2.substr(i, 2), 16);
-        const mixedChannel = Math.round(channel1 + (channel2 - channel1) * factor);
-        result.push(mixedChannel.toString(16).padStart(2, '0'));
-    }
-    return '#' + result.join('');
-}
-
-const generateBackground = (context, width, height, color, regenerate) => {
-
-    if(regenerate){
-    // Margin in inches
+const generateBackground = (context, width, height, color) => {
     const margin = 1 / 4;
 
     // Fill rectangle
     const backgroundColor = `rgb(${params.backgroundR}, ${params.backgroundG}, ${params.backgroundB})`;
     context.fillStyle = color ? color : backgroundColor;
     context.fillRect(margin, margin, width - margin * 2, height - margin * 2);
-    return;
-    }
-
-    const margin = 1 / 4;
-
-    // Fill rectangle
-   // const backgroundColor = `rgb(${params.backgroundR}, ${params.backgroundG}, ${params.backgroundB})`;
-    context.fillStyle = color ? color : _backgroundColor;
-    context.fillRect(margin, margin, width - margin * 2, height - margin * 2);
-
-
-
-    
 };
 
