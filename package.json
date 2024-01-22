@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "bezier-easing": "^2.1.0",
+    "camera-project": "^1.0.2",
+    "canvas-sketch": "^0.7.6",
+    "canvas-sketch-cli": "^1.11.20",
+    "canvas-sketch-util": "^1.10.0",
+    "convex-hull": "^1.0.3",
+    "gl-matrix": "^3.4.3",
+    "lodash": "^4.17.21",
+    "perspective-camera": "^2.0.1",
+    "random": "^3.0.0",
+    "seedrandom": "^3.0.5",
+    "tweakpane": "^3.1.0"
+  },
+  "scripts": {
+    "openSketch": "yarn run canvas-sketch-cli"
+  }
+}
