@@ -1,4 +1,9 @@
 {
+  "name": "skyline-generator",
+  "private": true,
+  "homepage": ".",
+  "version": "0.0.0",
+  "type": "module",
   "dependencies": {
     "bezier-easing": "^2.1.0",
     "camera-project": "^1.0.2",
