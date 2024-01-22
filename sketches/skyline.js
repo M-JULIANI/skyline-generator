@@ -20,7 +20,7 @@ const settings = {
 };
 
 const params = {
-    layers: 16,
+    layers: 7,
     height: 0.75,
     width: 0.05,
     seed: 42,
@@ -39,23 +39,17 @@ const params = {
 let shouldAnimate = false;
 let useRandomColor = false;
 
-let seedo = 0;
-let layero = 5;
-
 const sketch = ({ context, width, height }) => {
 
     generateBackground(context, width, height)
-    let skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
+    let skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed);
     skyline.drawCanvas(context);
 
     return ({ context, width, height }) => {
         if (shouldAnimate) {
-            seedo = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 100));
-            layero = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 10));
             generateBackground(context, width, height)
-            skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
+            skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed);
             shouldAnimate = false;
-            painted = true;
 
             try {
                 skyline.drawCanvas(context, params.colorSeed);
@@ -63,6 +57,7 @@ const sketch = ({ context, width, height }) => {
             catch (e) {
                 console.log(e);
             }
+            return;
         }
 
         generateBackground(context, width, height)
