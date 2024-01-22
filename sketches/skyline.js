@@ -24,8 +24,7 @@ const params = {
     height: 0.75,
     width: 0.05,
     seed: 42,
-    colorSeed: 0,
-    randomColor: 0,
+    colorSeed: 42,
     r1: 60,
     g1: 60,
     b1: 60,
@@ -52,11 +51,11 @@ const sketch = ({ context, width, height }) => {
     skyline.drawCanvas(context);
 
     return ({ context, width, height }) => {
-        seedo  = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 100));
+        seedo = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 100));
         layero = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 10));
 
-        
-        if(shouldRepaintBackground){
+
+        if (shouldRepaintBackground) {
             generateBackground(context, width, height)
             shouldRepaintBackground = false;
             try {
@@ -77,11 +76,11 @@ const sketch = ({ context, width, height }) => {
             catch (e) {
                 console.log(e);
             }
-        }    
+        }
 
         if (shouldRerender) {
 
-           // skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
+            // skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
             shouldRerender = false;
             generateBackground(context, width, height)
             try {
@@ -90,7 +89,7 @@ const sketch = ({ context, width, height }) => {
             catch (e) {
                 console.log(e);
             }
-        }  
+        }
 
     };
 };
@@ -99,7 +98,7 @@ const createPane = () => {
     const pane = new Tweakpane.Pane();
     let folder;
 
-    let mainFolder = pane.addFolder({title: 'skyline'})
+    let mainFolder = pane.addFolder({ title: 'skyline' })
 
     folder = mainFolder.addFolder({ title: 'Shape' });
     folder.addInput(params, 'layers', { min: 2, max: 20, step: 1 }).on('change', (value) => {
@@ -117,18 +116,22 @@ const createPane = () => {
     });
 
     folder = mainFolder.addFolder({ title: 'Color' });
+
+    // Add a button to the pane
+    folder.addButton({ title: 'Random color?' }).on('click', () => {
+        useRandomColor = !useRandomColor;
+        shouldRerender = true;
+        //  downloadCanvasAsPNG();
+    });
+
     folder.addInput(params, 'colorSeed', { min: 0.0, max: 100.0, step: 1.0 }).on('change', (value) => {
         shouldRerender = true;
 
     });
 
-    folder.addInput(params, 'randomColor', { min: 0.0, max: 1.0, step: 1.0 }).on('change', (value) => {
-        shouldRerender = true;
-    });
-
 
     folder = mainFolder.addFolder({ title: 'Blended Colors' });
-    folder = mainFolder.addFolder({ title: 'Color 1' });
+    folder = folder.addFolder({ title: 'Color 1' });
 
     folder.addInput(params, 'r1', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', (value) => {
         shouldRerender = true;
@@ -144,7 +147,7 @@ const createPane = () => {
     });;
 
 
-    folder = mainFolder.addFolder({ title: 'Color2' });
+    folder = folder.addFolder({ title: 'Color2' });
 
     folder.addInput(params, 'r2', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', (value) => {
         shouldRerender = true;
@@ -170,6 +173,11 @@ const createPane = () => {
     });
     folder.addInput(params, 'backgroundB', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', (value) => {
         shouldRepaintBackground = true;
+    });
+
+    // Add a button to the pane
+    mainFolder.addButton({ title: 'Download PNG' }).on('click', () => {
+        downloadCanvasAsPNG();
     });
 
     return pane;
@@ -198,7 +206,7 @@ createPane();
 //   dragOffsetX = e.clientX - paneElement.getBoundingClientRect().left;
 //   dragOffsetY = e.clientY - paneElement.getBoundingClientRect().top;
 //   paneElement.style.cursor = 'grabbing';
-  
+
 //   // Prevent default dragging behavior for images or text selections
 //   e.preventDefault();
 // });
@@ -261,7 +269,7 @@ class Skyline {
             let bHeight = mapRange(rH, 0, 1.0, minHeight, maxHeight);
 
             const n = (noise1D(x, maxWidth * 0.2, maxHeight * 0.25));
-            bHeight +=n;
+            bHeight += n;
             const bldg = new Building(x, 0, bWidth, bHeight);
             bldgs.push(bldg);
             x += bWidth;
@@ -296,7 +304,7 @@ class Skyline {
             const green = Math.floor(this.colorSeed() * 256);
             const blue = Math.floor(this.colorSeed() * 256);
 
-            const color = params.randomColor === 1
+            const color = useRandomColor
                 ? `rgb(${red}, ${green}, ${blue})`
                 : `rgb(${c.r}, ${c.g}, ${c.b})`;
             layer.forEach(x => this.drawBuilding(context, x, color, t))
@@ -413,3 +421,28 @@ const generateBackground = (context, width, height, color) => {
     context.fillRect(margin, margin, width - margin * 2, height - margin * 2);
 };
 
+
+function downloadCanvasAsPNG() {
+    // Assuming your canvas-sketch canvas has an id or you can fetch it another way
+    const canvas = document.querySelector('canvas'); // Adjust selector as needed
+    if (!canvas) {
+      console.error('Canvas not found');
+      return;
+    }
+  
+    // Create a PNG URL from the canvas
+    const imageURL = canvas.toDataURL('image/png').replace("image/png", "image/octet-stream");
+  
+    // Create a temporary link element and trigger the download
+    const downloadLink = document.createElement('a');
+    downloadLink.href = imageURL;
+    
+    // You can set the default file name for the download like this
+    downloadLink.download = 'canvas-sketch-export.png';
+  
+    // Append the link to the document, trigger click, and remove it
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+  
