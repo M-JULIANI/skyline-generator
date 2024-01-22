@@ -37,15 +37,25 @@ const params = {
 }
 
 let shouldAnimate = false;
+let shouldRepaint = false;
 let useRandomColor = false;
 
+
+
 const sketch = ({ context, width, height }) => {
+
+    window.addEventListener('resize', () => {
+    shouldRepaint = true;
+    // Redraw your canvas here
+    // canvas.width = window.innerWidth;
+    // canvas.height = window.innerHeight;
+ });
 
     generateBackground(context, width, height)
     let skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed);
     skyline.drawCanvas(context);
 
-    return ({ context, width, height }) => {
+    return ({ context, width, height}) => {
         if (shouldAnimate) {
             generateBackground(context, width, height)
             skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed);
@@ -60,9 +70,11 @@ const sketch = ({ context, width, height }) => {
             return;
         }
 
-        generateBackground(context, width, height)
-        skyline.drawCanvas(context, params.colorSeed);
-
+        if(shouldRepaint){
+            shouldRepaint = false;       
+            generateBackground(context, width, height)
+            skyline.drawCanvas(context, params.colorSeed);
+        }
     };
 };
 
@@ -90,32 +102,53 @@ const createPane = () => {
     folder = mainFolder.addFolder({ title: 'Color' });
 
     // Add a button to the pane
-    folder.addButton({ title: 'Random color?' }).on('click', () => {
+    folder.addButton({ title: 'Random color?' }).on('click', (value) => {
         useRandomColor = !useRandomColor;
+        shouldRepaint = true;
     });
 
-    folder.addInput(params, 'colorSeed', { min: 0.0, max: 100.0, step: 1.0 })
+    folder.addInput(params, 'colorSeed', { min: 0.0, max: 100.0, step: 1.0 }).on('change', (value) => {
+        shouldRepaint = true;
+    });
 
 
     folder = mainFolder.addFolder({ title: 'Blended Colors' });
     folder = folder.addFolder({ title: 'Color 1' });
 
-    folder.addInput(params, 'r1', { min: 0, max: 255, step: 1, label: 'Red' })
-    folder.addInput(params, 'g1', { min: 0, max: 255, step: 1, label: 'Green' })
-    folder.addInput(params, 'b1', { min: 0, max: 255, step: 1, label: 'Blue' })
+    folder.addInput(params, 'r1', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', () => {
+        shouldRepaint = true;
+    });
+    folder.addInput(params, 'g1', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', () => {
+        shouldRepaint = true;
+    });
+    folder.addInput(params, 'b1', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', () => {
+        shouldRepaint = true;
+    });
 
 
     folder = folder.addFolder({ title: 'Color2' });
 
-    folder.addInput(params, 'r2', { min: 0, max: 255, step: 1, label: 'Red' })
-    folder.addInput(params, 'g2', { min: 0, max: 255, step: 1, label: 'Green' })
-    folder.addInput(params, 'b2', { min: 0, max: 255, step: 1, label: 'Blue' })
+    folder.addInput(params, 'r2', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', () => {
+        shouldRepaint = true;
+    });
+    folder.addInput(params, 'g2', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', () => {
+        shouldRepaint = true;
+    });
+    folder.addInput(params, 'b2', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', () => {
+        shouldRepaint = true;
+    });
 
     folder = mainFolder.addFolder({ title: 'Background Color' });
 
-    folder.addInput(params, 'backgroundR', { min: 0, max: 255, step: 1, label: 'Red' })
-    folder.addInput(params, 'backgroundG', { min: 0, max: 255, step: 1, label: 'Green' })
-    folder.addInput(params, 'backgroundB', { min: 0, max: 255, step: 1, label: 'Blue' })
+    folder.addInput(params, 'backgroundR', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', () => {
+        shouldRepaint = true;
+    });
+    folder.addInput(params, 'backgroundG', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', () => {
+        shouldRepaint = true;
+    });
+    folder.addInput(params, 'backgroundB', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', () => {
+        shouldRepaint = true;
+    });
 
     // Add a button to the pane
     mainFolder.addButton({ title: 'Download PNG' }).on('click', () => {
@@ -125,9 +158,14 @@ const createPane = () => {
     return pane;
 }
 
-
-
 createPane();
+
+window.addEventListener('resize', () => {
+    shouldRepaint = true;
+    // Redraw your canvas here
+    // canvas.width = window.innerWidth;
+    // canvas.height = window.innerHeight;
+ });
 //
 // //  Make the pane draggable
 // let isDragging = false;
