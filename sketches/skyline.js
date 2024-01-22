@@ -22,7 +22,7 @@ const settings = {
 const params = {
     layers: 16,
     height: 0.75,
-    width: 0.1,
+    width: 0.05,
     seed: 42,
     colorSeed: 0,
     randomColor: 0,
@@ -32,8 +32,8 @@ const params = {
     r2: 255,
     g2: 255,
     b2: 255,
-    backgroundR: 180,
-    backgroundG: 180,
+    backgroundR: 222,
+    backgroundG: 202,
     backgroundB: 180
 }
 
@@ -108,7 +108,7 @@ const createPane = () => {
     folder.addInput(params, 'height', { min: 0.25, max: 1.0, step: 0.1 }).on('change', (value) => {
         shouldAnimate = true;
     });
-    folder.addInput(params, 'width', { min: 0.05, max: 1.0, step: 0.1 }).on('change', (value) => {
+    folder.addInput(params, 'width', { min: 0.05, max: 1.0, step: 0.01 }).on('change', (value) => {
         shouldAnimate = true;
     });
 
