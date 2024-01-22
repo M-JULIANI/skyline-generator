@@ -48,7 +48,8 @@ const params = {
     // endColor: `rgb(${255}, ${255}, ${255}`
 }
 
-let shouldAnimate = true;
+let shouldAnimate = false;
+let shouldRepaintBackground = false;
 let shouldRerender = false;
 let useRandomColor = false;
 
@@ -67,15 +68,11 @@ let bbackR = 0;
 let bbackG = 0;
 let bbackB = 0;
 
-let backgroundColor = 'white';
+let _backgroundColor = 'white';
 
 const sketch = ({ context, width, height }) => {
 
     generateBackground(context, width, height)
-
-   // seedo  = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 100));
-   // layero = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 10));
-   // console.log({layero})
     let skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
     skyline.drawCanvas(context);
 
@@ -95,14 +92,15 @@ const sketch = ({ context, width, height }) => {
         bfrontG = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
         bfrontB = Math.floor(mapRange(Math.random(), 0, 1.0, 0, 255));
 
-        backgroundColor = `rgb(${backR}, ${backG}, ${backB})`
+        _backgroundColor = `rgb(${backR}, ${backG}, ${backB})`
+        if(shouldRepaintBackground){
+            generateBackground(context, width, height, _backgroundColor)
+            shouldRepaintBackground = false;
+        }
         if (shouldAnimate) {
-
+            generateBackground(context, width, height, _backgroundColor)
             skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
-           // shouldAnimate = false;
-           // context.fillStyle = 'white';
-            generateBackground(context, width, height, backgroundColor)
-           // context.fillRect(0, 0, width, height);
+            shouldAnimate = false;
 
             try {
                 skyline.drawCanvas(context, params.colorSeed);
@@ -110,22 +108,21 @@ const sketch = ({ context, width, height }) => {
             catch (e) {
                 console.log(e);
             }
-        }
-        // else if (shouldRerender) {
-           
-        //     // skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed);
-        //     shouldRerender = false;
-        //    // context.fillStyle = 'white';
-        //     generateBackground(context, width, height)
-        //   //  context.fillRect(0, 0, width, height);
+        }    
 
-        //     try {
-        //         skyline.drawCanvas(context);
-        //     }
-        //     catch (e) {
-        //         console.log(e);
-        //     }
-        // }
+        if (shouldRerender) {
+
+           // skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
+            shouldRerender = false;
+
+            try {
+                skyline.drawCanvas(context, params.colorSeed);
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }  
+
     };
 };
 
@@ -150,7 +147,7 @@ const createPane = () => {
 
     folder = pane.addFolder({ title: 'Color' });
     folder.addInput(params, 'colorSeed', { min: 0.0, max: 100.0, step: 1.0 }).on('change', (value) => {
-        shouldRerender = true;
+        shouldAnimate = true;
 
     });
 
@@ -195,15 +192,15 @@ const createPane = () => {
     folder = pane.addFolder({ title: 'Background Color' });
 
     folder.addInput(params, 'backgroundR', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', (value) => {
-        shouldRerender = true;
+        shouldRepaintBackground = true;
 
     });
     folder.addInput(params, 'backgroundG', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', (value) => {
-        shouldRerender = true;
+        shouldRepaintBackground = true;
 
     });
     folder.addInput(params, 'backgroundB', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', (value) => {
-        shouldRerender = true;
+        shouldRepaintBackground = true;
     });
 }
 
@@ -409,18 +406,6 @@ const renderHatch = (
     context.fillRect(building.x, vOffset, building.width, -building.height);
 };
 
-
-
-// Utility function to lighten a color
-function lightenColor(color, percent) {
-    return mixColors('#ffffff', color, percent);
-}
-
-// Utility function to darken a color
-function darkenColor(color, percent) {
-    return mixColors('#000000', color, percent);
-}
-
 // Utility function to mix two colors
 function mixColors(color1, color2, percent) {
     const factor = percent / 100;
@@ -434,22 +419,28 @@ function mixColors(color1, color2, percent) {
     return '#' + result.join('');
 }
 
-const generateBackground = (context, width, height, color) => {
+const generateBackground = (context, width, height, color, regenerate) => {
+
+    if(regenerate){
     // Margin in inches
     const margin = 1 / 4;
-
-    // Off-white background
-   // context.fillStyle = 'hsl(88, 87%, 98%)';
-   // context.fillRect(0, 0, width, height);
-
-    // Gradient foreground
-   // const fill = context.createLinearGradient(0, 0, width, height);
-   // fill.addColorStop(0, 'gray');
-   // fill.addColorStop(1, 'white');
 
     // Fill rectangle
     const backgroundColor = `rgb(${params.backgroundR}, ${params.backgroundG}, ${params.backgroundB})`;
     context.fillStyle = color ? color : backgroundColor;
     context.fillRect(margin, margin, width - margin * 2, height - margin * 2);
+    return;
+    }
+
+    const margin = 1 / 4;
+
+    // Fill rectangle
+   // const backgroundColor = `rgb(${params.backgroundR}, ${params.backgroundG}, ${params.backgroundB})`;
+    context.fillStyle = color ? color : _backgroundColor;
+    context.fillRect(margin, margin, width - margin * 2, height - margin * 2);
+
+
+
+    
 };
 
