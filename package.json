@@ -14,6 +14,12 @@
     "tweakpane": "^3.1.0"
   },
   "scripts": {
-    "openSketch": "yarn run canvas-sketch-cli"
+    "openSketch": "yarn run canvas-sketch-cli",
+    "build": "parcel build index.html",
+    "deploy": "gh-pages -d dist"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1",
+    "parcel": "^2.11.0"
   }
 }

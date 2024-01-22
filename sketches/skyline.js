@@ -1,14 +1,8 @@
 const canvasSketch = require('canvas-sketch');
-const random = require("canvas-sketch-util/random")
-const math = require("canvas-sketch-util/math");
-const lodash = require('lodash');
-const { lerp, mapRange } = require('canvas-sketch-util/math');
-const { blend, RGBAToHex } = require('canvas-sketch-util/color');
-const { color } = require('canvas-sketch-util');
+const { mapRange } = require('canvas-sketch-util/math');
 const { noise1D } = require('canvas-sketch-util/random');
 const Tweakpane = require('tweakpane');
 const seedrandom = require('seedrandom');
-const rgbaToHex = require('canvas-sketch-util/lib/rgba-to-hex');
 
 const lerpColor = (color1, color2, t) => {
     const r = color1.r + t * (color2.r - color1.r);
