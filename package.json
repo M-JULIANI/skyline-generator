@@ -20,7 +20,7 @@
   },
   "scripts": {
     "openSketch": "yarn run canvas-sketch-cli",
-    "build": "parcel build index.html",
+    "build": "parcel build index.html --public-url /skyline-generator/",
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
