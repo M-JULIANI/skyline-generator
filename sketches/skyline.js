@@ -37,8 +37,6 @@ const params = {
 }
 
 let shouldAnimate = false;
-let shouldRepaintBackground = false;
-let shouldRerender = false;
 let useRandomColor = false;
 
 let seedo = 0;
@@ -51,24 +49,13 @@ const sketch = ({ context, width, height }) => {
     skyline.drawCanvas(context);
 
     return ({ context, width, height }) => {
-        seedo = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 100));
-        layero = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 10));
-
-
-        if (shouldRepaintBackground) {
-            generateBackground(context, width, height)
-            shouldRepaintBackground = false;
-            try {
-                skyline.drawCanvas(context, params.colorSeed);
-            }
-            catch (e) {
-                console.log(e);
-            }
-        }
         if (shouldAnimate) {
+            seedo = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 100));
+            layero = Math.floor(mapRange(Math.random(), 0, 1.0, 3, 10));
             generateBackground(context, width, height)
             skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
             shouldAnimate = false;
+            painted = true;
 
             try {
                 skyline.drawCanvas(context, params.colorSeed);
@@ -78,18 +65,8 @@ const sketch = ({ context, width, height }) => {
             }
         }
 
-        if (shouldRerender) {
-
-            // skyline = new Skyline(width, height, layero, params.width, params.height, seedo, params.colorSeed);
-            shouldRerender = false;
-            generateBackground(context, width, height)
-            try {
-                skyline.drawCanvas(context, params.colorSeed);
-            }
-            catch (e) {
-                console.log(e);
-            }
-        }
+        generateBackground(context, width, height)
+        skyline.drawCanvas(context, params.colorSeed);
 
     };
 };
@@ -107,7 +84,7 @@ const createPane = () => {
     folder.addInput(params, 'height', { min: 0.25, max: 1.0, step: 0.1 }).on('change', (value) => {
         shouldAnimate = true;
     });
-    folder.addInput(params, 'width', { min: 0.05, max: 1.0, step: 0.01 }).on('change', (value) => {
+    folder.addInput(params, 'width', { min: 0.05, max: 0.2, step: 0.01 }).on('change', (value) => {
         shouldAnimate = true;
     });
 
@@ -120,60 +97,30 @@ const createPane = () => {
     // Add a button to the pane
     folder.addButton({ title: 'Random color?' }).on('click', () => {
         useRandomColor = !useRandomColor;
-        shouldRerender = true;
-        //  downloadCanvasAsPNG();
     });
 
-    folder.addInput(params, 'colorSeed', { min: 0.0, max: 100.0, step: 1.0 }).on('change', (value) => {
-        shouldRerender = true;
-
-    });
+    folder.addInput(params, 'colorSeed', { min: 0.0, max: 100.0, step: 1.0 })
 
 
     folder = mainFolder.addFolder({ title: 'Blended Colors' });
     folder = folder.addFolder({ title: 'Color 1' });
 
-    folder.addInput(params, 'r1', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', (value) => {
-        shouldRerender = true;
-
-    });;
-    folder.addInput(params, 'g1', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', (value) => {
-        shouldRerender = true;
-
-    });;
-    folder.addInput(params, 'b1', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', (value) => {
-        shouldRerender = true;
-
-    });;
+    folder.addInput(params, 'r1', { min: 0, max: 255, step: 1, label: 'Red' })
+    folder.addInput(params, 'g1', { min: 0, max: 255, step: 1, label: 'Green' })
+    folder.addInput(params, 'b1', { min: 0, max: 255, step: 1, label: 'Blue' })
 
 
     folder = folder.addFolder({ title: 'Color2' });
 
-    folder.addInput(params, 'r2', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', (value) => {
-        shouldRerender = true;
-
-    });
-    folder.addInput(params, 'g2', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', (value) => {
-        shouldRerender = true;
-
-    });
-    folder.addInput(params, 'b2', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', (value) => {
-        shouldRerender = true;
-    });
+    folder.addInput(params, 'r2', { min: 0, max: 255, step: 1, label: 'Red' })
+    folder.addInput(params, 'g2', { min: 0, max: 255, step: 1, label: 'Green' })
+    folder.addInput(params, 'b2', { min: 0, max: 255, step: 1, label: 'Blue' })
 
     folder = mainFolder.addFolder({ title: 'Background Color' });
 
-    folder.addInput(params, 'backgroundR', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', (value) => {
-        shouldRepaintBackground = true;
-
-    });
-    folder.addInput(params, 'backgroundG', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', (value) => {
-        shouldRepaintBackground = true;
-
-    });
-    folder.addInput(params, 'backgroundB', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', (value) => {
-        shouldRepaintBackground = true;
-    });
+    folder.addInput(params, 'backgroundR', { min: 0, max: 255, step: 1, label: 'Red' })
+    folder.addInput(params, 'backgroundG', { min: 0, max: 255, step: 1, label: 'Green' })
+    folder.addInput(params, 'backgroundB', { min: 0, max: 255, step: 1, label: 'Blue' })
 
     // Add a button to the pane
     mainFolder.addButton({ title: 'Download PNG' }).on('click', () => {
@@ -182,6 +129,8 @@ const createPane = () => {
 
     return pane;
 }
+
+
 
 createPane();
 //
@@ -327,7 +276,7 @@ class Skyline {
         let usableSpacing = Math.max(1, (1 - lightenPercent) * baseSpacing);
         const horizontalPattern = horizontalCanvasPattern(context, baseStroke, color, usableSpacing)
         const verticalPattern = verticalCanvasPattern(context, baseStroke, color, usableSpacing)
-        const pat = Math.random() > 0.5 ? horizontalPattern : verticalPattern;
+        const pat = this.colorSeed() > 0.5  ? horizontalPattern : verticalPattern;
         renderHatch(context, building, this.screenHeight, pat)
     }
 }
@@ -426,23 +375,23 @@ function downloadCanvasAsPNG() {
     // Assuming your canvas-sketch canvas has an id or you can fetch it another way
     const canvas = document.querySelector('canvas'); // Adjust selector as needed
     if (!canvas) {
-      console.error('Canvas not found');
-      return;
+        console.error('Canvas not found');
+        return;
     }
-  
+
     // Create a PNG URL from the canvas
     const imageURL = canvas.toDataURL('image/png').replace("image/png", "image/octet-stream");
-  
+
     // Create a temporary link element and trigger the download
     const downloadLink = document.createElement('a');
     downloadLink.href = imageURL;
-    
+
     // You can set the default file name for the download like this
     downloadLink.download = 'canvas-sketch-export.png';
-  
+
     // Append the link to the document, trigger click, and remove it
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-  }
-  
+}
+
