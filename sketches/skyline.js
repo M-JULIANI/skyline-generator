@@ -75,7 +75,7 @@ const createPane = () => {
     const pane = new Tweakpane.Pane();
     let folder;
 
-    let mainFolder = pane.addFolder({ title: 'skyline' })
+    let mainFolder = pane.addFolder({ title: 'skyline-generator' })
 
     folder = mainFolder.addFolder({ title: 'Shape' });
     folder.addInput(params, 'layers', { min: 2, max: 20, step: 1 }).on('change', (value) => {
