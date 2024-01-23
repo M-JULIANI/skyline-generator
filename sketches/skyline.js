@@ -91,6 +91,7 @@ const createPane = () => {
     folder.addInput(params, 'height', { min: 0.25, max: 1.0, step: 0.1 }).on('change', (value) => {
         shouldAnimate = true;
     });
+
     folder.addInput(params, 'width', { min: 0.05, max: 0.2, step: 0.01 }).on('change', (value) => {
         shouldAnimate = true;
     });
@@ -108,7 +109,8 @@ const createPane = () => {
     });
 
     folder.addInput(params, 'colorSeed', { min: 0.0, max: 100.0, step: 1.0 }).on('change', (value) => {
-        shouldRepaint = true;
+        shouldRepaint = true; 
+        useRandomColor = true;
     });
 
 
@@ -117,12 +119,15 @@ const createPane = () => {
 
     folder.addInput(params, 'r1', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', () => {
         shouldRepaint = true;
+        useRandomColor = false;
     });
     folder.addInput(params, 'g1', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', () => {
         shouldRepaint = true;
+        useRandomColor = false;
     });
     folder.addInput(params, 'b1', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', () => {
         shouldRepaint = true;
+        useRandomColor = false;
     });
 
 
@@ -130,12 +135,15 @@ const createPane = () => {
 
     folder.addInput(params, 'r2', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', () => {
         shouldRepaint = true;
+        useRandomColor = false;
     });
     folder.addInput(params, 'g2', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', () => {
         shouldRepaint = true;
+        useRandomColor = false;
     });
     folder.addInput(params, 'b2', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', () => {
         shouldRepaint = true;
+        useRandomColor = false;
     });
 
     folder = mainFolder.addFolder({ title: 'Background Color' });
