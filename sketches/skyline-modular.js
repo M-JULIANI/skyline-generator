@@ -22,12 +22,20 @@ const lerpColor = (color1, color2, t) => {
 //     animate: false,
 //     //duration: 1000
 // };
+const targetWidthInches = 8;
+const targetHeightInches = 6;
+
+const inchesToPixels = (inches, targetDPI) => {
+    return inches * targetDPI;
+}
+
+const targetDPI = 300;
 
 const settings = {
     // dimensions: 'a4',
     //pixelsPerInch: 300,
    // units: 'in',
-    dimensions: [2160, 2160],
+    dimensions: [inchesToPixels(targetWidthInches, targetDPI), inchesToPixels(targetHeightInches, targetDPI)],
     
     scaleToView: true,
     animate: true,
@@ -36,11 +44,11 @@ const settings = {
 
 const params = {
     layers: 16,
-    module: 30,
-    height: 3.0,
+    module: 10,
+    height: 1.0,
     width: 0.1,
     seed: 42,
-    window: 5,
+    window: 1,
     colorSeed: 0,
     randomColor: 0,
     r1: 130,
@@ -49,6 +57,9 @@ const params = {
     r2: 255,
     g2: 205,
     b2: 0,
+    backgroundR: 222,
+    backgroundG: 202,
+    backgroundB: 180,
     //  borderWidth: 0,
     // startColor: `rgb(${0}, ${0}, ${0}`,
     // endColor: `rgb(${255}, ${255}, ${255}`
@@ -63,13 +74,13 @@ const sketch = ({ context, width, height }) => {
 
     generateBackground(context, width, height)
 
-    let skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed, params.window, params.module);
+    let skyline = new SkylineModular(height, width, params.layers, params.width, params.height, params.seed, params.colorSeed, params.window, params.module);
     skyline.drawCanvas(context);
 
     return ({ context, width, height }) => {
         if (shouldAnimate) {
 
-            skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed, params.window, params.module);
+            skyline = new SkylineModular(height, width, params.layers, params.width, params.height, params.seed, params.colorSeed, params.window, params.module);
             shouldAnimate = false;
             context.fillStyle = 'white';
             generateBackground(context, width, height)
@@ -170,6 +181,23 @@ const createPane = () => {
     folder.addInput(params, 'b2', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', (value) => {
         shouldRerender = true;
     });;
+
+    folder = pane.addFolder({ title: 'Background Color' });
+
+    folder.addInput(params, 'backgroundR', { min: 0, max: 255, step: 1, label: 'Red' }).on('change', () => {
+        shouldRerender = true;
+    });
+    folder.addInput(params, 'backgroundG', { min: 0, max: 255, step: 1, label: 'Green' }).on('change', () => {
+        shouldRerender = true;
+    });
+    folder.addInput(params, 'backgroundB', { min: 0, max: 255, step: 1, label: 'Blue' }).on('change', () => {
+        shouldRerender = true;
+    });
+
+    // Add a button to the pane
+    pane.addButton({ title: 'Download PNG' }).on('click', () => {
+        downloadCanvasAsPNG();
+    });
 }
 
 createPane();
@@ -184,7 +212,7 @@ class Building {
     }
 }
 
-class Skyline {
+class SkylineModular {
 
     buildings = [];
     constructor(screenHeight, screenWidth, layers, widthMultiplier, heightMultiplier, seed, colorSeed, dotSize, module) {
@@ -451,20 +479,35 @@ function mixColors(color1, color2, percent) {
     return '#' + result.join('');
 }
 
-const generateBackground = (context, width, height) => {
-    // Margin in inches
+const generateBackground = (context, width, height, color) => {
     const margin = 1 / 4;
 
-    // Off-white background
-    context.fillStyle = 'hsl(88, 87%, 98%)';
-    context.fillRect(0, 0, width, height);
-
-    // Gradient foreground
-    // const fill = context.createLinearGradient(0, 0, width, height);
-    // fill.addColorStop(0, 'gray');
-    // fill.addColorStop(1, 'white');
-
     // Fill rectangle
-    context.fillStyle = 'white';
+    const backgroundColor = `rgb(${params.backgroundR}, ${params.backgroundG}, ${params.backgroundB})`;
+    context.fillStyle = color ? color : backgroundColor;
     context.fillRect(margin, margin, width - margin * 2, height - margin * 2);
 };
+
+function downloadCanvasAsPNG() {
+    // Assuming your canvas-sketch canvas has an id or you can fetch it another way
+    const canvas = document.querySelector('canvas'); // Adjust selector as needed
+    if (!canvas) {
+        console.error('Canvas not found');
+        return;
+    }
+
+    // Create a PNG URL from the canvas
+    const imageURL = canvas.toDataURL('image/png').replace("image/png", "image/octet-stream");
+
+    // Create a temporary link element and trigger the download
+    const downloadLink = document.createElement('a');
+    downloadLink.href = imageURL;
+
+    // You can set the default file name for the download like this
+    downloadLink.download = 'canvas-sketch-export.png';
+
+    // Append the link to the document, trigger click, and remove it
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}

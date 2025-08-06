@@ -11,9 +11,16 @@ const lerpColor = (color1, color2, t) => {
     return { r, g, b };
 };
 
+const targetWidthInches = 8;
+const targetHeightInches = 6;
 
+const inchesToPixels = (inches, targetDPI) => {
+    return inches * targetDPI;
+}
+
+const targetDPI = 300;
 const settings = {
-    dimensions: [1950, 1350],
+    dimensions: [inchesToPixels(targetWidthInches, targetDPI), inchesToPixels(targetHeightInches, targetDPI)],
     scaleToView: true,
     animate: true,
     context: '2d'
