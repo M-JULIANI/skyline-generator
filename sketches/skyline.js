@@ -11,9 +11,16 @@ const lerpColor = (color1, color2, t) => {
     return { r, g, b };
 };
 
+const targetWidthInches = 8;
+const targetHeightInches = 6;
 
+const inchesToPixels = (inches, targetDPI) => {
+    return inches * targetDPI;
+}
+
+const targetDPI = 300;
 const settings = {
-    dimensions: [1080, 1080],
+    dimensions: [inchesToPixels(targetWidthInches, targetDPI), inchesToPixels(targetHeightInches, targetDPI)],
     scaleToView: true,
     animate: true,
     context: '2d'
@@ -52,13 +59,13 @@ const sketch = ({ context, width, height }) => {
  });
 
     generateBackground(context, width, height)
-    let skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed);
+    let skyline = new Skyline(height, width, params.layers, params.width, params.height, params.seed, params.colorSeed);
     skyline.drawCanvas(context);
 
     return ({ context, width, height}) => {
         if (shouldAnimate) {
             generateBackground(context, width, height)
-            skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed);
+            skyline = new Skyline(height, width, params.layers, params.width, params.height, params.seed, params.colorSeed);
             shouldAnimate = false;
 
             try {
@@ -237,7 +244,7 @@ class Skyline {
         this.allCells = [...Array(this.sizeX)].map(e => Array(this.sizeX).fill(this.originalCell));
 
         this.minBuildingWidth = 50 * widthMultiplier;
-        this.maxBuildingWidth = screenHeight * widthMultiplier;
+        this.maxBuildingWidth = screenWidth * widthMultiplier;
 
         this.minBuildingHeight = 10 * heightMultiplier;
         this.maxBuildingHeight = screenHeight * heightMultiplier;
