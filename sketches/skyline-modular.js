@@ -1,3 +1,5 @@
+// SKYLINE-MODULAR VERSION
+console.log('🎨 Running SKYLINE-MODULAR version');
 const canvasSketch = require('canvas-sketch');
 const random = require("canvas-sketch-util/random")
 const math = require("canvas-sketch-util/math");
@@ -43,22 +45,22 @@ const settings = {
 };
 
 const params = {
-    layers: 16,
-    module: 10,
+    layers: 12,
+    module: 22,
     height: 1.0,
     width: 0.1,
-    seed: 42,
-    window: 1,
+    seed: 31,
+    window: 2,
     colorSeed: 0,
     randomColor: 0,
-    r1: 130,
-    g1: 0,
-    b1: 183,
-    r2: 255,
-    g2: 205,
+    r1: 44,
+    g1:58,
+    b1: 111,
+    r2: 152,
+    g2: 191,
     b2: 0,
-    backgroundR: 222,
-    backgroundG: 202,
+    backgroundR: 180,
+    backgroundG: 175,
     backgroundB: 180,
     //  borderWidth: 0,
     // startColor: `rgb(${0}, ${0}, ${0}`,
