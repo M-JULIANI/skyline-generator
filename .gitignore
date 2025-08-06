@@ -2,3 +2,4 @@ node_modules/
 output/
 tmp/
 .parcel-cache/
+dist/
