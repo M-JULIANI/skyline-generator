@@ -73,19 +73,28 @@ let useRandomColor = false;
 
 
 const sketch = ({ context, width, height }) => {
-
-    generateBackground(context, width, height)
-
+    // Store the current dimensions to detect resize
+    let currentWidth = width;
+    let currentHeight = height;
+    
+    // Initial render
+    generateBackground(context, width, height);
     let skyline = new SkylineModular(height, width, params.layers, params.width, params.height, params.seed, params.colorSeed, params.window, params.module);
     skyline.drawCanvas(context);
 
     return ({ context, width, height }) => {
+        // Check if dimensions changed (resize occurred)
+        if (width !== currentWidth || height !== currentHeight) {
+            currentWidth = width;
+            currentHeight = height;
+            shouldRerender = true;
+        }
+        
         if (shouldAnimate) {
-
             skyline = new SkylineModular(height, width, params.layers, params.width, params.height, params.seed, params.colorSeed, params.window, params.module);
             shouldAnimate = false;
             context.fillStyle = 'white';
-            generateBackground(context, width, height)
+            generateBackground(context, width, height);
             context.fillRect(0, 0, width, height);
 
             try {
@@ -96,11 +105,9 @@ const sketch = ({ context, width, height }) => {
             }
         }
         else if (shouldRerender) {
-
-            // skyline = new Skyline(width, height, params.layers, params.width, params.height, params.seed, params.colorSeed);
             shouldRerender = false;
             context.fillStyle = 'white';
-            generateBackground(context, width, height)
+            generateBackground(context, width, height);
             context.fillRect(0, 0, width, height);
 
             try {
@@ -203,6 +210,12 @@ const createPane = () => {
 }
 
 createPane();
+
+// Add window resize listener to trigger rerender
+window.addEventListener('resize', () => {
+    shouldRerender = true;
+});
+
 canvasSketch(sketch, settings);
 
 class Building {
